@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.itcast.core.dao.NodeDao">
+ 
+ <insert id="addNode_approval" parameterType="cn.itcast.core.bean.Node_approval">
+ INSERT INTO node_approve (
+  node_approve_id,
+  node_approve_wid,
+  node_approve_start,
+  node_approve_one,
+  node_approve_two,
+  node_approve_three,
+  node_approve_four,
+  node_approve_five,
+  node_approve_end
+)
+VALUES
+  (
+    #{node_approve_id},
+    #{node_approve_wid},
+    #{node_approve_start},
+    #{node_approve_one},
+    #{node_approve_two},
+    #{node_approve_three},
+    #{node_approve_four},
+    #{node_approve_five},
+    #{node_approve_end}
+  );
+ </insert>
+ 
+ <select id="findApprovalMaxid" resultType="Integer">
+ SELECT MAX(s.`node_approve_id`) FROM node_approve s
+ </select>
+ 
+ 
+ 
+ <!-- 根据流程名称查询流程id -->
+ <select id="findApprovalByName" parameterType="String" resultType="Integer">
+ SELECT s.`workflow_id` FROM workflow s WHERE s.`workflow_name` = #{workflow_name};
+ </select>
+ 
+ 
+ 
+ 
+ <!-- 查询节点最大信息 -->
+ <select id="findNodeMaxId" resultType="Integer">
+ SELECT MAX(s.`node_id`) FROM node_new s
+ 
+ </select>
+ 
+  <!-- 查询创建者 -->
+ <select id="findApprovalTypeOne" resultType="cn.itcast.core.bean.Approval_new">
+ SELECT s.`approval_value` FROM approval_new s WHERE s.`approval_SecurityLevel` = 0 
+ </select>
+ <!-- 第一审批信息 -->
+ <select id="findApprovalTypeTwo" resultType="cn.itcast.core.bean.Approval_new">
+ SELECT s.`approval_value` FROM approval_new s WHERE s.`approval_SecurityLevel` IN(10,20) 
+ </select>
+ <!-- 查询未创建节点信息的流程 -->
+ <!-- <select id="findeWorkflowNotnode" resultType="cn.itcast.core.bean.Workflow">
+ SELECT s.`workflow_name` FROM workflow s WHERE s.`workflow_id` NOT IN (SELECT n.`node_workflowid` FROM node_new n ) AND s.`workflow_r` = 1
+ </select> -->
+ <!-- 查询未创建节点信息的流程 -->
+ <select id="findeWorkflowNotnode" resultType="cn.itcast.core.bean.Workflow">
+SELECT s.`workflow_name` FROM workflow s WHERE s.`workflow_id` NOT IN (SELECT n.`node_approve_wid` FROM node_approve n) AND s.`workflow_r` = 1
+ </select>
+ 
+ 
+ <!-- 第二审批信息 -->
+ <select id="findApprovalTypeThree" resultType="cn.itcast.core.bean.Approval_new">
+ SELECT s.`approval_value` FROM approval_new s WHERE s.`approval_SecurityLevel` IN(10,20,30)
+ </select>
+  <!-- 第三审批信息 -->
+ <select id="findApprovalTypeFour" resultType="cn.itcast.core.bean.Approval_new">
+ SELECT s.`approval_value` FROM approval_new s WHERE s.`approval_SecurityLevel` IN(20,30,40,50)
+ </select>
+ 
+ <!-- 第四审批信息 -->
+ <select id="findApprovalTypeFive" resultType="cn.itcast.core.bean.Approval_new">
+SELECT s.`approval_value` FROM approval_new s WHERE s.`approval_SecurityLevel` IN(1)
+ </select>
+ <!-- 归档 -->
+ <select id="findApprovalTypeSix" resultType="cn.itcast.core.bean.Approval_new">
+ SELECT s.`approval_value` FROM approval_new s WHERE s.`approval_SecurityLevel` IN(1)
+ </select>
+ 
+ <!-- 查询流程名称对应的id -->
+ <select id="findeWorkflowIdbyName" parameterType="String" resultType="String">
+ SELECT s.`workflow_id` FROM workflow s WHERE s.`workflow_name` = #{workflowname}
+ </select>
+ 
+ 
+ <!-- 查询节点信息根据id -->
+ <select id="findApprovalByid" parameterType="String" resultType="cn.itcast.core.bean.Node_new">
+ SELECT
+  `node_approvalname`,
+  `node_workflowname`
+  
+FROM
+ node_new s
+ WHERE s.`node_workflowid` = #{workflow_id}
+ </select>
+ 
+ <!-- 更新节点信息 -->
+ 
+<update id="updateApproval" parameterType="cn.itcast.core.bean.Node_new">
+UPDATE
+ node_new
+SET
+  `node_approvalone` = #{node_approvalone},
+  `node_approvaltwo` = #{node_approvaltwo},
+  `node_approvalthree` = #{node_approvalthree},
+  `node_approvalfour` = #{node_approvalfour},
+  `node_approvalfive` = #{node_approvalfive},
+  `node_approvalsix` = #{node_approvalsix}
+WHERE `node_id` = #{node_id};
+</update>
+ 
+ <!-- 创建流程界面查询节点信息 -->
+ <select id="findNode_approveByid" parameterType="String" resultType="cn.itcast.core.bean.Node_approval">
+ SELECT * FROM node_approve n WHERE n.`node_approve_wid` = #{workflow_id} 
+ </select>
+ 
+ <select id="Approval_showWorkflowdate" parameterType="String" resultType="cn.itcast.core.bean.Node_approval">
+ 
+ 
+ </select>
+ 
+ 
+</mapper>

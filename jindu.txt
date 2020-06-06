@@ -1,0 +1,21 @@
+进行到查询用户个人创建的全部流程      1
+
+进行到未审核流程的进入功能美化和创建时间日期的显示
+
+
+节点信息点击没有节点信息的流程时报集合为空错误
+
+
+2020-03-31 进度 到未实现从未完成的流程中点击节点信息后进入对应的节点信息，节点信息精确到谁审批
+
+
+
+SELECT (SELECT s.`user_name` FROM sys_user s WHERE s.`user_id` = d.`department_zhuguanji`) AS department_zhuguanji,
+(SELECT s.`user_name` FROM sys_user s WHERE s.`user_id` = d.`department_jingliji`) AS department_jingliji,
+(SELECT s.`user_name` FROM sys_user s WHERE s.`user_id` = d.`department_zongjianji`) AS department_zongjianji,
+(SELECT s.`user_name` FROM sys_user s WHERE s.`user_id` = d.`department_fuzongjingliji`) AS department_fuzongjingliji,
+(SELECT s.`user_name` FROM sys_user s WHERE s.`user_id` = d.`department_zongjingliji`) AS department_zongjingliji
+ FROM department d WHERE d.`department_id` = (SELECT s.`user_departmentid` FROM sys_user s WHERE s.`user_id` = 9);
+
+
+SELECT * FROM department d ,sys_user s WHERE s.`user_departmentid` = d.`department_id` AND s.`user_id` = 9

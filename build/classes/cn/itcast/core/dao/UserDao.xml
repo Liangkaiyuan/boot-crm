@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.itcast.core.dao.UserDao">
+<!-- 查询用户最大id -->
+<select id="findUserMaxId" resultType="Integer">
+SELECT MAX(s.`user_id`) FROM sys_user s
+</select>
+	 
+<!-- 用户insert方法 -->
+<insert id="adduser" >
+INSERT INTO `crm`.`sys_user` (
+  `user_id`,
+  `user_code`,
+  `user_loginName`,
+  `user_name`,
+  `user_password`,
+  `user_state`,
+  `user_a`,
+  `user_b`,
+  `user_c`,
+  `user_roleid`,
+  `user_departmentid`,
+  `user_pinyin`
+)
+VALUES
+  (
+    #{user_id},
+    #{user_code},
+    #{user_loginName},
+    #{user_name},
+    #{user_password},
+    #{user_state},
+    #{user_a},
+    #{user_b},
+    #{user_c},
+    #{user_roleid},
+    #{user_departmentid},
+    #{user_pinyin}
+  );
+ 
+</insert>
+
+<!-- 用户列表 -->
+<select id="userList" resultType="cn.itcast.core.bean.Sys_user">
+<!-- SELECT s.*,(SELECT r.role_name FROM role r WHERE s.`user_roleid` = r.role_id) FROM sys_user s -->
+SELECT s.`user_id`,s.`user_name`,s.`user_password`,s.`user_state`,(SELECT r.role_name FROM role r WHERE s.`user_roleid` = r.role_id) AS role_name FROM sys_user s
+</select>
+<!-- 通过用户id查询用户信息 -->
+<select id="findUserById" parameterType="Integer" resultType="cn.itcast.core.bean.Sys_user">
+SELECT s.`user_id`,s.`user_name`,s.`user_roleid`,s.`user_password`,s.`user_state`,(SELECT r.role_name FROM role r WHERE s.`user_roleid` = r.role_id) AS role_name,(SELECT r.role_id+"" FROM role r WHERE s.`user_roleid` = r.role_id) AS role_id FROM sys_user s
+ where s.`user_id` = #{user_id}
+
+</select>
+<!-- 查询全部角色 -->
+<select id="findAllRole" resultType="cn.itcast.core.bean.Role">
+SELECT * FROM role
+</select>
+
+ 	<!-- 用户登录 -->
+	<select id="userlogin" parameterType="String"
+		resultType="Integer">
+		SELECT user_id FROM sys_user WHERE user_name = "${username}" AND user_password
+		= #{password}
+	</select>
+
+ 
+
+</mapper>

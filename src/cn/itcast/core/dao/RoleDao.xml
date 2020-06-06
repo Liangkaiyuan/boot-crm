@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.itcast.core.dao.RoleDao">
+<!-- 查询角色最大id -->
+<select id="findRoleMaxId" resultType="Integer">
+SELECT MAX(s.`role_id`) FROM role s
+</select>
+	 
+
+<!-- 创建角色 -->
+<insert id="addRole" parameterType="cn.itcast.core.bean.Role">
+INSERT INTO `crm`.`role` (
+  `role_id`,
+  `role_name`,
+  `role_memo`,
+  `role_up`,
+  `role_dpm`,
+  `role_a`,
+  `role_b`,
+  `role_c`,
+  `role_status`
+)
+VALUES
+  (
+    #{role_id},
+    #{role_name},
+    #{role_memo},
+    #{role_up},
+    #{role_dpm},
+    #{role_a},
+    #{role_b},
+    #{role_c},
+    #{role_status}
+  );
+</insert>
+<!-- 查询全部角色 -->
+<select id="findAllRole" resultType="cn.itcast.core.bean.Role">
+SELECT * FROM role r WHERE r.`role_status` = 1 
+</select>
+
+<!-- 查询角色中的用户 -->
+<select id="roleUserList" parameterType="String" resultType="cn.itcast.core.bean.Sys_user">
+SELECT s.`user_id`,s.`user_name`,s.`user_password`,s.`user_state`,s.`user_roleid`,(SELECT r.role_name FROM role r WHERE s.`user_roleid` = r.role_id) AS role_name FROM sys_user s WHERE s.`user_roleid` = #{role_id}
+</select>
+
+<!-- 查询没有角色的用户 -->
+<select id="findAllUserNotRole" resultType="cn.itcast.core.bean.Sys_user">
+SELECT s.`user_id`,s.`user_name`,s.`user_password`,s.`user_state`,s.`user_roleid` FROM sys_user s WHERE s.`user_roleid` IS NULL OR s.`user_roleid` = "0" OR s.`user_roleid` = ""
+</select>
+
+<!-- 角色添加用户 -->
+<update id="UpdateRole_addUser" parameterType="String">
+UPDATE sys_user s SET s.`user_roleid` = ${role_id} WHERE s.`user_id` IN ${user_id}
+
+</update>
+<!-- 角色删除用户 -->
+<update id="Role_UpdateUser" parameterType="String">
+UPDATE sys_user s SET s.`user_roleid` = "0" WHERE s.`user_id` = #{user_id}
+</update>
+
+<!-- 通过角色id查询角色名称 -->
+<select id="findRoleNameByid" parameterType="String" resultType="String">
+SELECT r.`role_name` FROM role r WHERE r.`role_id` = #{role_id}
+</select>
+
+<!-- 查询用户表中的角色id字段是否含有这个角色id 返回用户名集合 -->
+<select id="findUserRoleid" parameterType="String" resultType="cn.itcast.core.bean.Sys_user">
+SELECT s.`user_name` FROM sys_user s WHERE s.`user_roleid` = #{role_id}
+</select>
+
+<!-- 删除角色 -->
+<update id="deleteRole" parameterType="String">
+UPDATE role r SET r.`role_status` = 0 WHERE r.`role_id` = #{role_id}
+</update>
+
+
+<!-- 角色中的权限 -->
+<select id="findRolePermission" parameterType="String" resultType="cn.itcast.core.bean.Head">
+SELECT * FROM head h WHERE h.`head_id` IN (SELECT p.`permission_headid` FROM permission p WHERE p.`permission_roleid` = #{role_id})
+</select>
+
+<!-- 查询角色中尚未添加的权限 -->
+<select id="findRoleNotPermission" parameterType="String" resultType="cn.itcast.core.bean.Head">
+SELECT * FROM head h WHERE h.`head_id` NOT IN (SELECT p.`permission_headid` FROM permission p WHERE p.`permission_roleid` = #{role_id})
+</select>
+
+<!-- 查询权限表中的最大权限 -->
+<select id="findPermissionMaxId" resultType="Integer">
+SELECT MAX(p.`permission_id`) FROM permission p
+</select>
+<!-- 批量添加权限 -->
+<insert id="Role_addPermission" parameterType="cn.itcast.core.bean.Head">
+insert into `permission` (
+  `permission_id`,
+  
+  `permission_roleid`,
+  
+  `permission_headid`
+
+)
+values
+  (
+    #{permission_id},
+    
+    #{permission_roleid},
+    
+    #{permission_headid}
+   
+  );
+</insert>
+<!-- 查询角色在权限表中是否还有权限 -->
+<select id="findPermissionId" parameterType="String" resultType="cn.itcast.core.bean.Permission">
+SELECT * FROM permission p WHERE p.`permission_roleid` = #{role_id}
+</select>
+
+<!-- 删除角色权限 -->
+<delete id="Role_deletePermission" parameterType="String">
+DELETE FROM permission WHERE permission_headid = #{headid} AND permission_roleid = #{roleid}
+</delete>
+
+<!-- 批量删除角色用户 --> <!-- 注意#{}的作用是只能传递一个有效的合法字符，可以有效的防治sql注入 ；   而${}可以传递一串字符简单的字符串替换，不安全-->
+<update id="Role_UpdateUserMany" parameterType="String">
+UPDATE
+  sys_user s
+SET
+  s.user_roleid = ''
+WHERE s.user_id in ${user_id};
+</update>
+
+
+
+ 
+</mapper>

@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.itcast.core.dao.WorkflowDao">
+
+	<!-- 新建流程方法 -->
+	<insert id="CreateWorkflow" parameterType="cn.itcast.core.bean.Workflow">
+		INSERT INTO workflow (
+  workflow_id,
+  workflow_name,
+  workflow_memo,
+  workflow_a,
+  workflow_b,
+  workflow_c,
+  workflow_d,
+  workflow_e,
+  workflow_f,
+  workflow_g,
+  workflow_h,
+  workflow_i,
+  workflow_j,
+  workflow_k,
+  workflow_l,
+  workflow_m,
+  workflow_n,
+  workflow_o,
+  workflow_p,
+  workflow_q,
+  workflow_r,
+  workflow_s,
+  workflow_t,
+  workflow_u,
+  workflow_v,
+  workflow_w,
+  workflow_x,
+  workflow_y,
+  workflow_z,
+  workflow_uid,
+  workflow_node_id
+)
+VALUES
+  (
+    #{workflow_id},
+    #{workflow_name},
+    #{workflow_memo},
+    #{workflow_a},
+    #{workflow_b},
+    #{workflow_c},
+    #{workflow_d},
+    #{workflow_e},
+    #{workflow_f},
+    #{workflow_g},
+    #{workflow_h},
+    #{workflow_i},
+    #{workflow_j},
+    #{workflow_k},
+    #{workflow_l},
+    #{workflow_m},
+    #{workflow_n},
+    #{workflow_o},
+    #{workflow_p},
+    #{workflow_q},
+    #{workflow_r},
+    #{workflow_s},
+    #{workflow_t},
+    #{workflow_u},
+    #{workflow_v},
+    #{workflow_w},
+    #{workflow_x},
+    #{workflow_y},
+    #{workflow_z},
+    #{workflow_uid},
+    #{workflow_node_id}
+  );
+</insert>
+	<!--获取流程表里的最大id -->
+	<select id="getWorkflowMaxId" resultType="Integer">
+		SELECT MAX(workflow_id) FROM workflow
+	</select>
+	
+	<!-- 查询全部流程信息 -->
+	<select id="findWorkflowList" parameterType="Integer" resultType="cn.itcast.core.bean.Workflow">
+	SELECT * FROM workflow s WHERE s.`workflow_r` !=2 limit #{start},#{rows}
+	</select>
+	
+	<!-- 根据流程id返回某个流程的显示信息 -->
+	<select id="ShowWorkflowOne" parameterType="Integer" resultType="cn.itcast.core.bean.Workflow">
+	select * from workflow where workflow_id = #{workflow_id}
+	</select>
+	
+	<!-- 查询流程信息表中最大的id -->
+	<select id="findWorkflowDataMaxId" resultType="Integer">
+	SELECT MAX(workflow_data_id) FROM workflow_data
+	</select>
+	
+	
+	<!-- 添加对应的数据到数据信息存储表中 -->
+	<insert id="addworkflowdata">
+	INSERT INTO crm.workflow_data (
+  workflow_data_id,
+  workflow_id,
+  workflow_name,
+  workflow_data_a,
+  workflow_data_b,
+  workflow_data_c,
+  workflow_data_d,
+  workflow_data_e,
+  workflow_data_f,
+  workflow_data_g,
+  workflow_data_h,
+  workflow_data_i,
+  workflow_data_j,
+  workflow_data_k,
+  workflow_data_l,
+  workflow_data_m,
+  workflow_data_n,
+  workflow_data_o,
+  workflow_data_p,
+  workflow_data_q,
+  workflow_data_r,
+  workflow_data_s,
+  workflow_data_t,
+  workflow_data_u,
+  workflow_data_v,
+  workflow_data_w,
+  workflow_data_x,
+  workflow_data_y,
+  workflow_data_z,
+  workflow_data_uid,
+  workflow_data_node_id,
+  workflow_data_createtime
+)
+VALUES
+  (
+    #{workflow_data_id},
+   #{workflow_id},
+   #{workflow_name},
+    #{workflow_data_a},
+    #{workflow_data_b},
+    #{workflow_data_c},
+    #{workflow_data_d},
+    #{workflow_data_e},
+    #{workflow_data_f},
+    #{workflow_data_g},
+    #{workflow_data_h},
+    #{workflow_data_i},
+    #{workflow_data_j},
+    #{workflow_data_k},
+    #{workflow_data_l},
+    #{workflow_data_m},
+    #{workflow_data_n},
+    #{workflow_data_o},
+    #{workflow_data_p},
+    #{workflow_data_q},
+    #{workflow_data_r},
+    #{workflow_data_s},
+    #{workflow_data_t},
+    #{workflow_data_u},
+    #{workflow_data_v},
+    #{workflow_data_w},
+    #{workflow_data_x},
+    #{workflow_data_y},
+    #{workflow_data_z},
+    #{workflow_data_uid},
+    #{workflow_data_node_id},
+    #{workflow_data_createtime}
+  );
+	</insert>
+	
+	<!-- 通过用户id查询用户有关的所有流程名称 -->
+<select id="findworkflowByUserid" parameterType="Integer" resultType="cn.itcast.core.bean.Workflow">
+SELECT s.workflow_id,s.workflow_name,s.workflow_memo FROM workflow s WHERE s.workflow_id IN (SELECT a.workflow_id FROM workflow_data a WHERE a.workflow_data_uid = #{userid} GROUP BY a.workflow_id) 
+</select>
+	
+	<!-- 查询用户未审核完成的流程 第一步-->
+	<select id="findNotFinishworkflowdata" parameterType="Integer" resultType="cn.itcast.core.bean.Workflow_data">
+	SELECT s.workflow_data_id,s.workflow_id,s.workflow_name,s.workflow_data_createtime FROM workflow_data s WHERE s.`workflow_data_s` = 1 AND s.`workflow_data_uid` = #{userid} 
+	</select>
+	<!-- 查询用户已审核完成的流程-->
+	<select id="findFinishworkflowdata" parameterType="Integer" resultType="cn.itcast.core.bean.Workflow_data">
+	SELECT * FROM workflow_data s WHERE s.`workflow_data_s` = 2 AND s.`workflow_data_uid` = #{userid}
+	</select>
+	<!-- 未完成流程进入功能,查询用户对应流程的存储信息 1表示未完成，2表示完成-->
+	<select id="findNotFinishworkflowdataIN" parameterType="Integer" resultType="cn.itcast.core.bean.Workflow_data">
+	SELECT * FROM workflow_data s WHERE s.`workflow_data_id` =#{workflow_data_id} AND s.`workflow_data_uid` =#{userid} AND s.`workflow_data_s` = 1 
+	</select>
+	<!-- 查询流程中对应的显示信息 -->
+	<select id="findNotFinishworkflowIN" parameterType="Integer" resultType="cn.itcast.core.bean.Workflow">
+	SELECT * FROM workflow s WHERE s.`workflow_id` = #{workflow_id}
+	</select>
+	
+	<!-- 已完成查询已审核流程中对应的显示信息 -->
+	<select id="findFinishworkflowIN" parameterType="Integer" resultType="cn.itcast.core.bean.Workflow">
+	SELECT * FROM workflow s WHERE s.`workflow_id` = #{workflow_id}
+	</select>
+	
+	<!-- 已完成流程进入功能,查询用户对应流程的存储信息 1表示未完成，2表示完成-->
+	<select id="findFinishworkflowdataIN" parameterType="Integer" resultType="cn.itcast.core.bean.Workflow_data">
+	SELECT * FROM workflow_data s WHERE s.`workflow_data_id` =#{workflow_data_id} AND s.`workflow_data_uid` =#{userid} AND s.`workflow_data_s` = 2 
+	</select>
+	
+	<!-- 通过流程id查询流程信息 -->
+	<select id="findWorkflowByid" parameterType="Integer" resultType="cn.itcast.core.bean.Workflow">
+	SELECT * FROM workflow s WHERE s.`workflow_id` = #{workflow_id}
+	</select>
+	<update id="updateWorkflow" parameterType="cn.itcast.core.bean.Workflow">
+	UPDATE
+   `workflow`
+SET
+  `workflow_name` = #{workflow_name},
+  `workflow_memo` = #{workflow_memo},
+  `workflow_a` = #{workflow_a},
+  `workflow_b` = #{workflow_b},
+  `workflow_c` = #{workflow_c},
+  `workflow_d` = #{workflow_d},
+  `workflow_e` = #{workflow_e},
+  `workflow_f` = #{workflow_f},
+  `workflow_g` = #{workflow_g},
+  `workflow_h` = #{workflow_h},
+  `workflow_i` = #{workflow_i},
+  `workflow_j` = #{workflow_j},
+  `workflow_k` = #{workflow_k},
+  `workflow_l` = #{workflow_l},
+  `workflow_m` = #{workflow_m},
+  `workflow_n` = #{workflow_n},
+  `workflow_o` = #{workflow_o},
+  `workflow_p` = #{workflow_p},
+  `workflow_q` = #{workflow_q},
+  `workflow_r` = #{workflow_r},
+  `workflow_s` = #{workflow_s},
+  `workflow_t` = #{workflow_t},
+  `workflow_u` = #{workflow_u},
+  `workflow_v` = #{workflow_v},
+  `workflow_w` = #{workflow_w},
+  `workflow_x` = #{workflow_x},
+  `workflow_y` = #{workflow_y},
+  `workflow_z` = #{workflow_z},
+  `workflow_uid` = #{workflow_uid},
+  `workflow_node_id` = #{workflow_node_id}
+  WHERE `workflow_id` = #{workflow_id};
+	</update>
+	
+	<!-- 查找有效流程 0为测试，1为有效-->
+	<select id="findworkflowNormal" resultType="cn.itcast.core.bean.Workflow">
+	SELECT * FROM workflow s WHERE s.`workflow_r` = 1
+	</select>
+	
+	<!-- 删除流程 -->
+	<update id="deleteWorkflow" parameterType="Integer">
+	UPDATE
+    workflow s
+    SET
+    s.workflow_r = 2
+    WHERE s.workflow_id = #{workflow_id};
+	</update>
+	
+	
+	
+</mapper>

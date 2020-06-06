@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.itcast.core.dao.PermissionDao">
+ <select id="findPermissionByUserid" parameterType="Integer" resultType="cn.itcast.core.bean.Head">
+
+
+	SELECT * FROM head h WHERE h.`head_id` IN (
+	SELECT p.`permission_headid` FROM permission p WHERE p.`permission_roleid` IN
+	(SELECT s.`user_roleid` FROM sys_user s WHERE s.`user_id` = #{user_id})
+	);
+ 
+ 
+ 
+ </select>
+ 
+</mapper>

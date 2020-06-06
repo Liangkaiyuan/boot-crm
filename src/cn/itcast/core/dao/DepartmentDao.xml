@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.itcast.core.dao.DepartmentDao">
+
+<!-- 查询部门最大id -->
+ <select id="findDepartmentMaxId" resultType="Integer">
+ SELECT
+  max(department_id)
+FROM
+  `department`;
+ </select>
+ 
+ <!-- 创建部门 -->
+ <insert id="addDepartment" parameterType="cn.itcast.core.bean.Department">
+ INSERT INTO `department` (
+  `department_id`,
+  `department_name`,
+  `department_zhuguanji`,
+  `department_jingliji`,
+  `department_zongjianji`,
+  `department_fuzongjingliji`,
+  `department_zongjingliji`
+)
+VALUES
+  (
+    #{department_id},
+    #{department_name},
+    #{department_zhuguanji},
+    #{department_jingliji},
+    #{department_zongjianji},
+    #{department_fuzongjingliji},
+    #{department_zongjingliji}
+  );
+ </insert>
+ <!-- 查询部门全部信息 -->
+ <select id="findDepartmentAll" resultType="cn.itcast.core.bean.Department">
+SELECT
+  t.department_id,
+ t.department_name,
+  (SELECT s.user_name FROM sys_user s WHERE s.`user_id` = t.department_zhuguanji) AS department_zhuguanji,
+  (SELECT s.user_name FROM sys_user s WHERE s.`user_id` = t.department_jingliji) AS department_jingliji,
+  (SELECT s.user_name FROM sys_user s WHERE s.`user_id` = t.department_zongjianji) AS department_zongjianji,
+  (SELECT s.user_name FROM sys_user s WHERE s.`user_id` = t.department_fuzongjingliji) AS department_fuzongjingliji,
+ (SELECT s.user_name FROM sys_user s WHERE s.`user_id` = t.department_zongjingliji)  AS department_zongjingliji
+FROM
+ `department` t
+
+ </select>
+ 
+ <select id="selectDepartment" resultType="cn.itcast.core.bean.Sys_user">
+ SELECT
+  `user_id`,
+  `user_loginName`
+FROM
+   `sys_user`;
+ </select>
+ 
+ <!-- 查询全部部门信息 -->
+ <select id="selectDepartmentOne" parameterType="Long" resultType="cn.itcast.core.bean.Department">
+ SELECT
+  t.department_id,
+ t.department_name,
+  (SELECT s.user_name FROM sys_user s WHERE s.`user_id` = t.department_zhuguanji) AS department_zhuguanji,
+  (SELECT s.user_name FROM sys_user s WHERE s.`user_id` = t.department_jingliji) AS department_jingliji,
+  (SELECT s.user_name FROM sys_user s WHERE s.`user_id` = t.department_zongjianji) AS department_zongjianji,
+  (SELECT s.user_name FROM sys_user s WHERE s.`user_id` = t.department_fuzongjingliji) AS department_fuzongjingliji,
+ (SELECT s.user_name FROM sys_user s WHERE s.`user_id` = t.department_zongjingliji)  AS department_zongjingliji
+FROM
+ `department` t where t.department_id = #{department_id}
+ 
+ </select>
+ 
+ <select id="departmentShowUser" parameterType="String" resultType="cn.itcast.core.bean.Sys_user">
+ SELECT * FROM sys_user s WHERE s.`user_name` LIKE '%#{uname1}%';
+ </select>
+ 
+ 
+ <!-- 通过用户名称查询用户id -->
+ <select id="findUserIdByName" parameterType="String" resultType="Integer">
+ SELECT s.`user_id` FROM sys_user s WHERE s.`user_name` = #{name}
+ </select>
+ 
+ <!-- 跳转到部门编辑 -->
+ <select id="toEditDepartment" parameterType="Integer" resultType="cn.itcast.core.bean.Department">
+ 
+ SELECT
+  t.department_id,
+ t.department_name,
+  (SELECT s.user_name FROM sys_user s WHERE s.`user_id` = t.department_zhuguanji) AS department_zhuguanji,
+  (SELECT s.user_name FROM sys_user s WHERE s.`user_id` = t.department_jingliji) AS department_jingliji,
+  (SELECT s.user_name FROM sys_user s WHERE s.`user_id` = t.department_zongjianji) AS department_zongjianji,
+  (SELECT s.user_name FROM sys_user s WHERE s.`user_id` = t.department_fuzongjingliji) AS department_fuzongjingliji,
+ (SELECT s.user_name FROM sys_user s WHERE s.`user_id` = t.department_zongjingliji)  AS department_zongjingliji
+FROM
+ `department` t
+ where t.department_id = #{department_id}
+ 
+ </select>
+ 
+ <update id="EditDepartment" parameterType="cn.itcast.core.bean.Department">
+ UPDATE
+   `department`
+SET
+  `department_name` = #{department_name},
+  `department_zhuguanji` = #{department_zhuguanji},
+  `department_jingliji` = #{department_jingliji},
+  `department_zongjianji` = #{department_zongjianji},
+  `department_fuzongjingliji` = #{department_fuzongjingliji},
+  `department_zongjingliji` = #{department_zongjingliji}
+WHERE `department_id` = #{department_id};
+ </update>
+ 
+ <!-- 根据拼音首拼查询用户信息-->
+ <select id="findUserNameByuser_pinyin" parameterType="String" resultType="cn.itcast.core.bean.Sys_user">
+ SELECT * FROM sys_user s WHERE s.`user_pinyin` like '%${user_pinyin}%';
+ </select>
+ 
+ <!-- 部门查询用户列表 -->
+ <select id="departmentUserList" parameterType="Integer" resultType="cn.itcast.core.bean.Sys_user">
+ <!--  SELECT * FROM sys_user s WHERE s.`user_departmentid` = #{department_id} AND s.`user_state` = '1';-->
+ SELECT s.*,(SELECT d.`department_name` FROM department d WHERE d.`department_id` = s.`user_departmentid`) AS department_name FROM sys_user s
+ WHERE s.`user_departmentid` = #{department_id} AND s.`user_state` = '1' 
+ 
+ </select>
+ 
+ <!-- 查询全部没有部门的用户 -->
+ <select id="UserNotdepartment" resultType="cn.itcast.core.bean.Sys_user">
+ SELECT * FROM sys_user s WHERE s.`user_state` = '1'  AND s.`user_departmentid` = '' OR s.`user_departmentid` IS NULL;
+ </select>
+ 
+ <!--  -->
+ <update id="department_addUser" parameterType="String">
+ UPDATE sys_user s SET s.`user_departmentid` = #{department_id} WHERE s.`user_id` = #{user_id}
+ </update>
+ 
+ 
+</mapper>
